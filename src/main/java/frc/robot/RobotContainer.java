@@ -50,8 +50,8 @@ public class RobotContainer {
   }
   public void teleopPeriodic() {
     // red xbox joysticks are inverted
-    double throttleCap = .65;
-    double turnCap = .7;
+    double throttleCap = SmartDashboard.getNumber("throttleCap", .7);
+    double turnCap = SmartDashboard.getNumber("turnCap", .7);
     double throttle = -m_driverController.getLeftY() * throttleCap;
     double turn = -m_driverController.getRightX() * turnCap;
     SmartDashboard.putNumber("throttle", throttle);
