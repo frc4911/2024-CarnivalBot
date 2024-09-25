@@ -8,6 +8,11 @@ import frc.robot.Constants.OperatorConstants;
 import frc.robot.commands.Autos;
 import frc.robot.commands.ExampleCommand;
 import frc.robot.subsystems.ExampleSubsystem;
+
+import com.ctre.phoenix.motorcontrol.can.WPI_TalonSRX;
+
+import edu.wpi.first.wpilibj.drive.DifferentialDrive;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import edu.wpi.first.wpilibj2.command.button.Trigger;
@@ -19,7 +24,15 @@ import edu.wpi.first.wpilibj2.command.button.Trigger;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-  // The robot's subsystems and commands are defined here...
+    // Right, not inverted
+    final WPI_TalonSRX motor1 = new WPI_TalonSRX(1);
+    // Right, not inverted
+    final WPI_TalonSRX motor2 = new WPI_TalonSRX(2);
+    // Left, inverted
+    final WPI_TalonSRX motor3 = new WPI_TalonSRX(3);
+    // Left, inverted
+    final WPI_TalonSRX motor4 = new WPI_TalonSRX(4);
+    private final DifferentialDrive drive = new DifferentialDrive(motor3, motor1);
   private final ExampleSubsystem m_exampleSubsystem = new ExampleSubsystem();
 
   // Replace with CommandPS4Controller or CommandJoystick if needed
@@ -28,9 +41,25 @@ public class RobotContainer {
 
   /** The container for the robot. Contains subsystems, OI devices, and commands. */
   public RobotContainer() {
+    motor3.setInverted(true);
+    motor4.setInverted(true);
+    motor4.follow(motor3);
+    motor2.follow(motor1);
     // Configure the trigger bindings
     configureBindings();
   }
+  public void teleopPeriodic() {
+    // red xbox joysticks are inverted
+    double throttleCap = SmartDashboard.getNumber("throttleCap", .7);
+    double turnCap = SmartDashboard.getNumber("turnCap", .7);
+    double throttle = -m_driverController.getLeftY() * throttleCap;
+    double turn = -m_driverController.getRightX() * turnCap;
+    SmartDashboard.putNumber("throttle", throttle);
+    SmartDashboard.putNumber("turn", turn);
+    SmartDashboard.putNumber("throttleCap", throttleCap);
+    SmartDashboard.putNumber("turnCap", turnCap);
+    drive.arcadeDrive(throttle, turn);
+}
 
   /**
    * Use this method to define your trigger->command mappings. Triggers can be created via the
